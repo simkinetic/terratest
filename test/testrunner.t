@@ -45,9 +45,9 @@ local files_to_skip = dictionary{
 __silent__ = true
 
 --print teststatistics for test environments
-for filename in io.popen("ls -p"):lines() do
+for filename in io.popen("ls -p test"):lines() do
     if istestfile(filename) and not files_to_skip[filename] then
-        local execstring = prefix .. " " .. filename .. " --test --silent"
+        local execstring = prefix .. " test/" .. filename .. " --test --silent"
         local exitcode = os.execute(execstring)
         if exitcode ~= 0 then
             local message = format.bold .. format.red .. "Process exited with exitcode " .. tostring(exitcode)
