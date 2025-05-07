@@ -3,8 +3,8 @@
   "uuid": "4510efb2-5399-47b1-a173-7e7c2ca7b288",
   "authors": [
     "[rrhiemstar]rrhiemstar@gmail.com",
-    "[tpkessler]t.kessler@posteo.de>"
+    "[tpkessler]t.kessler@posteo.de\u003e"
   ],
   "language": "terra",
-  "version": "v0.1.0"
+  "version": "v1.0.0"
 }
