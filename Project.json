@@ -1,0 +1,9 @@
+{
+  "name": "terratest",
+  "uuid": "4510efb2-5399-47b1-a173-7e7c2ca7b288",
+  "authors": [
+    "[rrhiemstar]rrhiemstar@gmail.com"
+  ],
+  "language": "terra",
+  "version": "v0.1.0"
+}
