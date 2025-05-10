@@ -27,6 +27,6 @@ jobs:
 
       # Clean up Apptainer cache
       - name: Clean Apptainer cache
-        run: apptainer cache clean
+        run: apptainer cache clean --force
         if: always()
         
