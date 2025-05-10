@@ -24,7 +24,7 @@ jobs:
       # Run tests inside the Apptainer image
       - name: Run tests
         run: |
-          apptainer exec --bind $PWD:/app -e COSM_DEPOT_PATH=/.cosm ci-terra.sif bash -c "cosm activate && terra test/testrunner.t --test"
+          apptainer exec --bind $PWD:/app ci-terra.sif bash -c "cosm activate && terra test/testrunner.t --test"
 
       # Clean up Apptainer cache
       - name: Clean Apptainer cache
