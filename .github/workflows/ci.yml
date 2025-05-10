@@ -10,24 +10,15 @@ jobs:
   test:
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/simkinetic/arch-apptainer:latest
+      image: apptainer/apptainer:latest
       options: --privileged
     steps:
-      # Checkout the repository code
       - name: Checkout code
         uses: actions/checkout@v4
-
-      # Pull the public Apptainer image
       - name: Pull Apptainer image
         run: apptainer pull ci-terra.sif oras://ghcr.io/simkinetic/ci-terra:latest
-
-      # Run tests inside the Apptainer image
       - name: Run tests
-        run: |
-          apptainer exec --bind $PWD:/app ci-terra.sif bash -c "cosm activate && terra test/testrunner.t --test"
-
-      # Clean up Apptainer cache
+        run: apptainer exec --bind $PWD:/app ci-terra.sif bash -c "cosm activate && . /app/.cosm/.env && terra test/testrunner.t --test"
       - name: Clean Apptainer cache
         run: apptainer cache clean
         if: always()
-        
