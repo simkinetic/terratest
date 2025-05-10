@@ -1,0 +1,32 @@
+name: CI with Apptainer in Arch Linux
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/simkinetic/arch-apptainer:latest
+      options: --privileged
+    steps:
+      # Checkout the repository code
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Pull the public Apptainer image
+      - name: Pull Apptainer image
+        run: apptainer pull ci-terra.sif oras://ghcr.io/simkinetic/ci-terra:latest
+
+      # Run tests inside the Apptainer image
+      - name: Run tests
+        run: |
+          apptainer exec --bind $PWD:/app -e COSM_DEPOT_PATH=/.cosm ci-terra.sif bash -c "cosm activate && terra test/testrunner.t --test"
+
+      # Clean up Apptainer cache
+      - name: Clean Apptainer cache
+        run: apptainer cache clean
+        if: always()
