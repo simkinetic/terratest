@@ -13,20 +13,43 @@ jobs:
       image: ghcr.io/simkinetic/arch-apptainer:latest
       options: --privileged
     steps:
-      # Checkout the repository code
       - name: Checkout code
         uses: actions/checkout@v4
-
-      # Pull the public Apptainer image
       - name: Pull Apptainer image
         run: apptainer pull ci-terra.sif oras://ghcr.io/simkinetic/ci-terra:latest
-
-      # Run tests inside the Apptainer image
       - name: Run tests
-        run: apptainer exec --bind $PWD:/app ci-terra.sif bash -c "cosm activate && . /app/.cosm/.env && terra test/testrunner.t --test"
-
-      # Clean up Apptainer cache
+        id: run-tests
+        run: |
+          # Run tests, capture output and exit code
+          OUTPUT=$(apptainer exec --bind $PWD:/app ci-terra.sif bash -c "cosm activate && . /app/.cosm/.env && terra test/testrunner.t --test" 2>&1)
+          EXIT_CODE=$?
+          
+          # Print output to stdout
+          echo "$OUTPUT"
+          
+          # Save output to temporary file for parsing
+          echo "$OUTPUT" > test_output.txt
+          
+          # Extract total tests passed and failed
+          PASSED=$(grep -oP 'Total Tests Passed: \K\d+' test_output.txt || echo "0")
+          echo "Total Tests Passed: $PASSED"
+          echo "TESTS_PASSED=$PASSED" >> $GITHUB_ENV
+          
+          FAILED=$(grep -oP 'Total Tests Failed: \K\d+' test_output.txt || echo "0")
+          echo "Total Tests Failed: $FAILED"
+          echo "TESTS_FAILED=$FAILED" >> $GITHUB_ENV
+          
+          # Fail if exit code is non-zero or tests failed
+          if [ "$EXIT_CODE" -ne 0 ] || [ "$FAILED" -gt 0 ]; then
+            echo "Test failures or execution errors detected"
+            exit 1
+          fi
       - name: Clean Apptainer cache
         run: apptainer cache clean --force
         if: always()
-        
+      - name: Summarize test results
+        run: |
+          echo "Test Summary:"
+          echo "Total Tests Passed: ${{ env.TESTS_PASSED }}"
+          echo "Total Tests Failed: ${{ env.TESTS_FAILED }}"
+        if: always()
