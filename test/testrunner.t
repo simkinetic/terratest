@@ -1,3 +1,8 @@
+-- SPDX-FileCopyrightText: 2024 René Hiemstra <rrhiemstar@gmail.com>
+-- SPDX-FileCopyrightText: 2024 Torsten Keßler <t.kessler@posteo.de>
+--
+-- SPDX-License-Identifier: MIT
+
 local prefix = arg[-1]
 
 -- Is this a test file?
@@ -30,7 +35,6 @@ print(format.normal)
 
 -- List files to be skipped
 local files_to_skip = dictionary{
-
 }
 
 -- Global - use silent output - only testenv summary
@@ -40,13 +44,19 @@ __silent__ = true
 local total_passed = 0
 local total_failed = 0
 
--- Function to parse test output (e.g., "6/8 tests passed")
+-- Function to parse test output with multiple lines (e.g., "6/8 tests passed")
 local function parse_test_output(output)
-    local passed, total = output:match("(%d+)/(%d+)%s+tests passed")
-    if passed and total then
-        return tonumber(passed), tonumber(total) - tonumber(passed)
+    local file_passed = 0
+    local file_failed = 0
+    -- Iterate over each line
+    for line in output:gmatch("[^\r\n]+") do
+        local passed, total = line:match("(%d+)/(%d+)%s+tests passed")
+        if passed and total then
+            file_passed = file_passed + tonumber(passed)
+            file_failed = file_failed + (tonumber(total) - tonumber(passed))
+        end
     end
-    return 0, 0
+    return file_passed, file_failed
 end
 
 -- Run test files and capture output
@@ -60,7 +70,7 @@ for filename in io.popen("ls -p test"):lines() do
             local exitcode = pipe:close() and 0 or 1  -- 0 if successful, 1 if failed
             if exitcode ~= 0 then
                 local message = format.bold .. format.red .. "Process exited with exitcode " .. tostring(exitcode)
-                io.write(string.format("%-25s%-50s%-30s\n", filename, message, "NA" .. format.normal))
+                io.stdout:write(string.format("%-25s%-50s%-30s\n", filename, message, "NA" .. format.normal))
             else
                 -- Parse output for pass/fail counts
                 local passed, failed = parse_test_output(output)
@@ -71,7 +81,7 @@ for filename in io.popen("ls -p test"):lines() do
             end
         else
             local message = format.bold .. format.red .. "Failed to execute " .. filename
-            io.write(string.format("%-25s%-50s%-30s\n", filename, message, "NA" .. format.normal))
+            io.stdout:write(string.format("%-25s%-50s%-30s\n", filename, message, "NA" .. format.normal))
         end
     end
 end
