@@ -40,7 +40,7 @@ jobs:
           echo "EXIT_CODE=$EXIT_CODE" >> $GITHUB_ENV
       - name: Check test results
         run: |
-          # Print output again for visibility in failure case
+          # Print test output
           echo "Test Output (Check Step):"
           cat test_output.txt
           
