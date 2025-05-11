@@ -17,16 +17,6 @@ jobs:
         uses: actions/checkout@v4
       - name: Pull Apptainer image
         run: apptainer pull ci-terra.sif oras://ghcr.io/simkinetic/ci-terra:latest
-      - name: Debug environment
-        run: |
-          # Log environment details
-          apptainer exec --bind $PWD:/app ci-terra.sif bash -c "cosm activate && . /app/.cosm/.env && env"
-          # Check terra path
-          apptainer exec --bind $PWD:/app ci-terra.sif bash -c "cosm activate && . /app/.cosm/.env && which terra"
-          # Check test files
-          apptainer exec --bind $PWD:/app ci-terra.sif bash -c "ls -l /app/test/"
-          # Check arg[-1]
-          apptainer exec --bind $PWD:/app ci-terra.sif bash -c "cosm activate && . /app/.cosm/.env && lua -e 'print(arg[-1])' test/testrunner.t"
       - name: Run tests
         id: run-tests
         run: |
