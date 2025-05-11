@@ -1,8 +1,3 @@
--- SPDX-FileCopyrightText: 2024 René Hiemstra <rrhiemstar@gmail.com>
--- SPDX-FileCopyrightText: 2024 Torsten Keßler <t.kessler@posteo.de>
---
--- SPDX-License-Identifier: MIT
-
 local prefix = arg[-1]
 
 -- Is this a test file?
