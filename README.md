@@ -1,4 +1,4 @@
-[![CI Status](https://img.shields.io/github/workflow/status/simkinetic/terratest/ci-apptainer-archlinux?style=flat-square)](https://github.com/simkinetic/terratest/actions)
+[![CI Status](https://img.shields.io/github/actions/workflow/status/simkinetic/terratest/ci.yml?branch=main&style=flat-square)](https://github.com/simkinetic/terratest/actions)
 
 # terratest
 terratest is a simple unittesting library for use in the [terra programming language](https://github.com/terralang/terra). It is written as a language extension of terra and provides several keywords: `test`, `testenv`, `testset`, and `terracode`. `test` signals a boolean lua/terra expression, `testenv` provides a safe environment for writing tests, which may be organized in `testset`'s. Finally, `terracode` represents a block of terra code.
