@@ -35,7 +35,6 @@ print(format.normal)
 
 -- List files to be skipped
 local files_to_skip = dictionary{
-    "test3.t"
 }
 
 -- Global - use silent output - only testenv summary
