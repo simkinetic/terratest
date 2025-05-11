@@ -3,55 +3,93 @@
 --
 -- SPDX-License-Identifier: MIT
 
---local prefix = terralib and terralib.terrahome and terralib.terrahome .."/bin/terra" or "../terra"
 local prefix = arg[-1]
 
---is this a testfile?
+-- Is this a test file?
 local function istestfile(filename)
-    return string.sub(filename, 1, 4) == "test" and filename~="testrunner.t"
+    return string.sub(filename, 1, 4) == "test" and filename ~= "testrunner.t"
 end
 
---turn list into a set
+-- Turn list into a set
 local function dictionary(list)
     local dict = {}
-    for i,v in ipairs(list) do
-        dict[v] = true 
+    for i, v in ipairs(list) do
+        dict[v] = true
     end
     return dict
 end
 
---define colors for printing test-statistics
+-- Define colors for printing test statistics
 format = terralib.newlist()
 format.normal = "\27[0m"
 format.bold = "\27[1m"
 format.red = "\27[31m"
 format.green = "\27[32m"
 format.yellow = "\27[33m"
-format.header = format.bold..format.yellow
+format.header = format.bold .. format.yellow
 
---print the header
+-- Print the header
 print(format.header)
-print(string.format("%-15s%-50s%-30s", "Filename", "Test-environment", "Test-result"))
+print(string.format("%-25s%-50s%-30s", "Filename", "Test-environment", "Test-result"))
 print(format.normal)
 
---list files to be skipped
+-- List files to be skipped
 local files_to_skip = dictionary{
     "test1.t",
     "test3.t",
     "test5.t",
 }
 
---global - use silent output - only testenv summary
+-- Global - use silent output - only testenv summary
 __silent__ = true
 
---print teststatistics for test environments
+-- Initialize totals
+local total_passed = 0
+local total_failed = 0
+
+-- Function to parse test output (e.g., "6/8 tests passed")
+local function parse_test_output(output)
+    local passed, total = output:match("(%d+)/(%d+)%s+tests passed")
+    if passed and total then
+        return tonumber(passed), tonumber(total) - tonumber(passed)
+    end
+    return 0, 0
+end
+
+-- Run test files and capture output
 for filename in io.popen("ls -p test"):lines() do
     if istestfile(filename) and not files_to_skip[filename] then
         local execstring = prefix .. " test/" .. filename .. " --test --silent"
-        local exitcode = os.execute(execstring)
-        if exitcode ~= 0 then
-            local message = format.bold .. format.red .. "Process exited with exitcode " .. tostring(exitcode)
-            io.write(string.format("%-25s%-59s%-30s\n", filename, message, "NA"..format.normal))
+        -- Open a pipe to capture output
+        local pipe = io.popen(execstring .. " 2>&1", "r")
+        if pipe then
+            local output = pipe:read("*all")
+            local exitcode = pipe:close() and 0 or 1  -- 0 if successful, 1 if failed
+            if exitcode ~= 0 then
+                local message = format.bold .. format.red .. "Process exited with exitcode " .. tostring(exitcode)
+                io.write(string.format("%-25s%-50s%-30s\n", filename, message, "NA" .. format.normal))
+            else
+                -- Parse output for pass/fail counts
+                local passed, failed = parse_test_output(output)
+                total_passed = total_passed + passed
+                total_failed = total_failed + failed
+                -- Print the original output
+                io.stdout:write(output)
+            end
+        else
+            local message = format.bold .. format.red .. "Failed to execute " .. filename
+            io.write(string.format("%-25s%-50s%-30s\n", filename, message, "NA" .. format.normal))
         end
     end
+end
+
+-- Print total results
+print(format.header)
+print(string.format("Total Tests Passed: %d", total_passed))
+print(string.format("Total Tests Failed: %d", total_failed))
+print(format.normal)
+
+-- Exit with non-zero code if tests failed
+if total_failed > 0 then
+    os.exit(1)
 end
