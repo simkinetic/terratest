@@ -1,4 +1,4 @@
-name: CI with Apptainer in Arch Linux
+name: ci-apptainer-archlinux
 
 on:
   push:
@@ -32,11 +32,9 @@ jobs:
           
           # Extract total tests passed and failed
           PASSED=$(grep -oP 'Total Tests Passed: \K\d+' test_output.txt || echo "0")
-          echo "Total Tests Passed: $PASSED"
           echo "TESTS_PASSED=$PASSED" >> $GITHUB_ENV
           
           FAILED=$(grep -oP 'Total Tests Failed: \K\d+' test_output.txt || echo "0")
-          echo "Total Tests Failed: $FAILED"
           echo "TESTS_FAILED=$FAILED" >> $GITHUB_ENV
           
           # Fail if exit code is non-zero or tests failed
