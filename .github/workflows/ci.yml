@@ -23,11 +23,7 @@ jobs:
           # Run tests, capture output and exit code
           OUTPUT=$(apptainer exec --bind $PWD:/app ci-terra.sif bash -c "cosm activate && . /app/.cosm/.env && terra test/testrunner.t --test" 2>&1 || echo "Execution failed with exit code $?" >&2)
           EXIT_CODE=$?
-          
-          # Print output to stdout
-          echo "Test Output:"
-          echo "$OUTPUT"
-          
+
           # Save output to temporary file for parsing
           echo "$OUTPUT" > test_output.txt
           
