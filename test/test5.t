@@ -31,7 +31,7 @@ SVector = terralib.memoize(function(T,N)
     return Class
 end)
 
-import "terratest" -- using the terra unit test library
+import "terratest@v1/terratest" -- using the terra unit test library
 
 
 testenv "Vector implementation" do

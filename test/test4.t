@@ -4,7 +4,7 @@
 -- SPDX-License-Identifier: MIT
 
 
-import "terratest"
+import "terratest@v1/terratest"
 
 testenv "first test environement" do
 

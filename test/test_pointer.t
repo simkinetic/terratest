@@ -7,7 +7,7 @@
 local C = terralib.includecstring([[
     #include <stdio.h>
 ]])
-import "terratest"
+import "terratest@v1/terratest"
 
 terra set(p: &double)
     @p = 1.0

@@ -5,7 +5,7 @@
 
 
 local C = terralib.includec("stdio.h")
-import "terratest"
+import "terratest@v1/terratest"
 
 struct A{
     b : int
